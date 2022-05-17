@@ -26,8 +26,10 @@ void motor_set_freq(motor_config_t* config, float freq){
 }
 
 void motor_set_duty(motor_config_t* config, float duty){
-//	uint32_t ARR = config->tim->Instance->ARR;
 	uint32_t pwm_value = duty * config->period;
+	if(pwm_value > 0){
+		pwm_value -= 1;
+	}
 	config->duty = duty;
 	__HAL_TIM_SET_COMPARE(config->tim, TIM_CHANNEL_1, pwm_value);
 }
@@ -51,10 +53,9 @@ void motor_set_delay_us(motor_config_t* config, float delay_us){
 }
 
 void start_motors(motor_config_t* config, uint16_t length){
-	for (int i = 0; i < length; ++i) {
+	for (int i = length-1; i >= 0; --i) {
 		HAL_TIM_PWM_Start(config[i].tim, TIM_CHANNEL_1);
 	}
-//	HAL_TIM_PWM_Start(config[0].tim, TIM_CHANNEL_1);
 }
 
 void stop_motors(motor_config_t* config, uint16_t length){

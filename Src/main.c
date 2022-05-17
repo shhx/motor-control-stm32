@@ -48,7 +48,7 @@
 
 /* USER CODE BEGIN PV */
 uint32_t SYSCLK;
-uint32_t num_motors;
+uint8_t num_motors;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

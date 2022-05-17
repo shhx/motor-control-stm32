@@ -36,7 +36,7 @@ typedef struct {
 	UART_HandleTypeDef* huart;
 } decoder_t;
 
-extern uint32_t num_motors;
+extern uint8_t num_motors;
 
 void decoder_initialise(decoder_t *decoder, UART_HandleTypeDef *huart);
 retval_t get_new_data(decoder_t *decoder);
