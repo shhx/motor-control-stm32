@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
-#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -96,14 +95,13 @@ int main(void)
   MX_TIM9_Init();
   MX_DMA_Init();
   MX_USART1_UART_Init();
-  MX_SPI1_Init();
   MX_TIM2_Init();
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
 
   SYSCLK = HAL_RCC_GetSysClockFreq();
-//  GPIO_TypeDef *ports[] = {GPIOE, GPIOA, GPIOA, GPIOD, GPIOA, GPIOE};
-//  uint32_t pins[] = {GPIO_PIN_9, GPIO_PIN_15, GPIO_PIN_6, GPIO_PIN_12, GPIO_PIN_0, GPIO_PIN_5};
+//  GPIO_TypeDef *ports[] = {GPIOE, 	 GPIOA, 	  GPIOC, 	  GPIOD,  	   GPIOA, 	   GPIOA};
+//  uint32_t pins[] = 		{GPIO_PIN_9, GPIO_PIN_15, GPIO_PIN_6, GPIO_PIN_12, GPIO_PIN_0, GPIO_PIN_2};
   TIM_HandleTypeDef timers[] = {htim1, htim2, htim3, htim4, htim5, htim9};
   num_motors = sizeof(timers)/sizeof(timers[0]);
   motor_config_t motors[num_motors];

@@ -23,6 +23,7 @@ void motor_set_freq(motor_config_t* config, float freq){
 	config->period = period;
 	config->freq = freq;
 	__HAL_TIM_SET_AUTORELOAD(config->tim, period - 1);
+	tim->Instance->EGR |= TIM_EGR_UG;
 }
 
 void motor_set_duty(motor_config_t* config, float duty){
