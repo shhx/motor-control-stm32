@@ -84,18 +84,16 @@ class motor_control:
 
 if __name__ == '__main__':
     NUM_MOTORS = 6
+    freqs = [100, 220, 120, 300, 280, 1000]
     ser = Serial("COM7", baudrate=115200)
     control = motor_control(NUM_MOTORS, ser)
     control.stop_motors()
     for i in range(NUM_MOTORS):
-        control.config_motor(i, 100, 0.2, 0)
-        # control.set_motor_freq(i, 100)
+        control.config_motor(i, freqs[i], 0.1, i*100)
 
-    control.set_motor_delay(2, 100)
-    # time.sleep(1)
     control.start_motors()
     time.sleep(0.1)
-    # control.stop_motors()
+    control.stop_motors()
     
     print(control)
     
