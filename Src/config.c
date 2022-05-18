@@ -7,7 +7,7 @@
 void init_config(motor_config_t* config, float freq, float duty, float delay){
 	motor_set_freq(config, freq);
 	motor_set_duty(config, duty);
-	motor_set_delay(config, delay);
+//	motor_set_delay_us(config, delay);
 }
 
 void motor_set_freq(motor_config_t* config, float freq){
@@ -43,7 +43,7 @@ void motor_set_delay(motor_config_t* config, float delay){
 
 void motor_set_delay_us(motor_config_t* config, float delay_us){
 	TIM_HandleTypeDef* tim = config->tim;
-	uint32_t ARR = tim->Instance->ARR;
+	uint32_t ARR = (config->period - 1);//tim->Instance->ARR;
 	float period_us = 1e6 / config->freq;
 	if(delay_us > period_us){
 		delay_us = 0;
@@ -67,6 +67,7 @@ void stop_motors(motor_config_t* config, uint16_t length){
 
 void reset_motor_timers(motor_config_t* config, uint16_t length){
 	for (int i = 0; i < length; ++i) {
-		__HAL_TIM_SET_COUNTER(config[i].tim, 0);
+		// Triggering update event resets CNT and PSC cnt
+		config[i].tim->Instance->EGR |= TIM_EGR_UG;
 	}
 }
