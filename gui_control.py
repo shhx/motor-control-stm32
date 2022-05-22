@@ -34,18 +34,22 @@ def connect(ports, index):
             return
         control.connect(ports[index].device)
         cnt_button['text'] = 'Disconnect'
-        
+
     elif cnt_button['text'] == 'Disconnect':
         control.disconnect()
         cnt_button['text'] = 'Connect'
 
-def cmd_start(*args):
+def cmd_start():
     for i in range(NUM_MOTORS):
         freq  = float(freq_entries[i].get())
         duty  = float(duty_entries[i].get())
         delay = float(delay_entries[i].get())
         control.config_motor(i, freq, duty, delay)
     control.start_motors()
+
+def cmd_reload():
+    control.stop_motors()
+    cmd_start()
 
 root = Tk()
 root.title("Valve control")
@@ -67,8 +71,13 @@ com_combo.grid(column=1, row=0, sticky=W)
 ports = load_com_ports(com_combo)
 
 
-column = 2
+column = 1
 row_init = 2
+for i in range(NUM_MOTORS):
+    ttk.Label(mainframe, text=f'Valve {i+1}').grid(column=column, row=row_init + i + 1)
+
+
+column += 1
 freq_entries = []
 ttk.Label(mainframe, text="Frequency [Hz]").grid(column=column, row=row_init)
 for i in range(NUM_MOTORS):
@@ -98,8 +107,9 @@ for i in range(NUM_MOTORS):
     delay_entry.grid(column=column, row=i + row_init + 1, sticky=(W, E))
     delay_entries.append(delay) 
 
-ttk.Button(mainframe, text="Start valves", command=cmd_start).grid(column=2, row=NUM_MOTORS + 3, columnspan=4)
-ttk.Button(mainframe, text="Stop valves", command=control.stop_motors).grid(column=2, row=NUM_MOTORS + 4, columnspan=4)
+ttk.Button(mainframe, text="Reload config", command=cmd_reload).grid(column=1, row=NUM_MOTORS + 3, columnspan=2)
+ttk.Button(mainframe, text="Start valves", command=cmd_start).grid(column=2, row=NUM_MOTORS + 3, columnspan=2)
+ttk.Button(mainframe, text="Stop valves", command=control.stop_motors).grid(column=3, row=NUM_MOTORS + 3, columnspan=2)
 
 for child in mainframe.winfo_children(): 
     child.grid_configure(padx=5, pady=5)

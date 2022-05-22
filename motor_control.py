@@ -90,10 +90,12 @@ class motor_control:
     def start_motors(self):
         cmd_start = cmd_struct(self.__header, 0, command.ACTIVATE_MOTORS.value)
         self.send_cmd(bytearray(cmd_start))
+        print('STARTED!!!')
 
     def stop_motors(self):
         cmd_stop = cmd_struct(self.__header, 0, command.STOP_MOTORS.value)
         self.send_cmd(bytearray(cmd_stop))
+        print('STOP!!!')
 
     def send_cmd(self, cmd: bytearray):
         if self.connected:
