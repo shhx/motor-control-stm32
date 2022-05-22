@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from serial import Serial
+from serial.tools import list_ports
 
 
 class command(Enum):
@@ -32,11 +33,29 @@ class motor:
 class motor_control:
     __header = 0xFAFF
 
-    def __init__(self, n_motors: int, serial: Serial) -> None:
-        self.ser = serial
+    def __init__(self, n_motors: int, port: str) -> None:
+        self.port = port
+        self.connected = False
+        self.serial = None
         self.motors = []
+        if self.port:
+            self.connect(port)
+
         for i in range(n_motors):
             self.motors.append(motor(num=i))
+
+    def connect(self, port: str):
+        try:
+            self.port = port
+            self.ser = Serial(port=self.port, baudrate=115200)
+            self.connected = True
+        except Exception as e:
+            print(e)
+    
+    def disconnect(self):
+        if self.connected:
+            self.ser.close()
+            self.connected = False
 
     def set_motor_freq(self, num: int, freq: float):
         self.motors[num].freq = freq
@@ -63,6 +82,7 @@ class motor_control:
         self.send_cmd(cmd_bytes)
     
     def config_motor(self, num: int, freq: float, duty: float, delay: float):
+        print(freq, duty, delay)
         self.set_motor_freq(num, freq)
         self.set_motor_duty(num, duty)
         self.set_motor_delay(num, delay)
@@ -76,24 +96,28 @@ class motor_control:
         self.send_cmd(bytearray(cmd_stop))
 
     def send_cmd(self, cmd: bytearray):
-        print(cmd.hex(), len(cmd))
-        self.ser.write(cmd)
+        if self.connected:
+            self.ser.write(cmd)
+        # print(cmd.hex(), len(cmd))
 
     def __repr__(self) -> str:
         return "\n".join([str(m) for m in self.motors])
 
 if __name__ == '__main__':
     NUM_MOTORS = 6
-    freqs = [100, 220, 120, 300, 280, 1000]
-    ser = Serial("COM7", baudrate=115200)
-    control = motor_control(NUM_MOTORS, ser)
+    freqs = [1, 30, 100, 200, 10, 1]
+    dutys = [0.0, 0.0, 0.0, 0.19, 0.0, 0.0]
+    ports = list_ports.comports()
+    print(ports[0].device, ports[0].description)
+    control = motor_control(NUM_MOTORS, None)
+    control.connect(ports[0].device)
     control.stop_motors()
     for i in range(NUM_MOTORS):
-        control.config_motor(i, freqs[i], 0.1, i*100)
+        control.config_motor(i, freqs[i], 0., 0)
 
     control.start_motors()
     time.sleep(0.1)
-    control.stop_motors()
+    # control.stop_motors()
     
     print(control)
     
