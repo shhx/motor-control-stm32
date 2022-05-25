@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import ttk
+from typing import List
 
-from serial import Serial
+from PIL import Image, ImageTk
 from serial.tools import list_ports
 
 from motor_control import motor_control
@@ -24,12 +25,12 @@ def load_com_ports(com_combo):
         com_combo.set('')
         com_descrip.set('')
         cnt_button['state'] = DISABLED   
-    
+
     return ports
 
 def connect(ports, index):    
     if cnt_button['text'] == 'Connect':
-        if(index < 0):
+        if index < 0:
             print('No port detected!')
             return
         control.connect(ports[index].device)
@@ -51,6 +52,16 @@ def cmd_reload():
     control.stop_motors()
     cmd_start()
 
+def set_same_val(entries: List, index: int):
+    for e in entries:
+        e.set(entries[index].get())
+
+def load_icon(icon_size):
+    im = Image.open("arrow.png")
+    im = im.resize(icon_size, Image.ANTIALIAS)
+    img = ImageTk.PhotoImage(im)
+    return img
+
 root = Tk()
 root.title("Valve control")
 # root.geometry('100x250')
@@ -70,6 +81,8 @@ com_combo = ttk.Combobox(mainframe, width=13)
 com_combo.grid(column=1, row=0, sticky=W)
 ports = load_com_ports(com_combo)
 
+icon_size = (15, 15)
+icon = load_icon(icon_size)
 
 column = 1
 row_init = 2
@@ -79,7 +92,10 @@ for i in range(NUM_MOTORS):
 
 column += 1
 freq_entries = []
-ttk.Label(mainframe, text="Frequency [Hz]").grid(column=column, row=row_init)
+frame = Frame(mainframe)
+ttk.Label(frame, text="Frequency [Hz]").pack(side='left')
+Button(frame, image=icon, command=lambda: set_same_val(freq_entries, index=0), height=icon_size[0], width=icon_size[1]).pack(side='left')
+frame.grid(column=column, row=row_init)
 for i in range(NUM_MOTORS):
     freq = StringVar()
     freq.set(freqs[i])
@@ -89,7 +105,10 @@ for i in range(NUM_MOTORS):
 
 column += 1
 duty_entries = []
-ttk.Label(mainframe, text="Duty cycle [%]").grid(column=column, row=row_init)
+frame = Frame(mainframe)
+ttk.Label(frame, text="Duty cycle [0-1]").pack(side='left')
+Button(frame, image=icon, command=lambda: set_same_val(duty_entries, index=0), height=icon_size[0], width=icon_size[1]).pack(side='left')
+frame.grid(column=column, row=row_init)
 for i in range(NUM_MOTORS):
     duty = StringVar()
     duty.set(dutys[i])
@@ -99,7 +118,10 @@ for i in range(NUM_MOTORS):
 
 column += 1
 delay_entries = []
-ttk.Label(mainframe, text="Delay [us]").grid(column=column, row=row_init)
+frame = Frame(mainframe)
+ttk.Label(frame, text="Delay [us]").pack(side='left')
+Button(frame, image=icon, command=lambda: set_same_val(delay_entries, index=0), height=icon_size[0], width=icon_size[1]).pack(side='left')
+frame.grid(column=column, row=row_init)
 for i in range(NUM_MOTORS):
     delay = StringVar()
     delay.set(delays[i])
@@ -114,7 +136,14 @@ ttk.Button(mainframe, text="Stop valves", command=control.stop_motors).grid(colu
 for child in mainframe.winfo_children(): 
     child.grid_configure(padx=5, pady=5)
 
+
+def on_close():
+    if control.connected:
+        control.disconnect()
+    exit()
+
 # feet_entry.focus()
 # root.bind("<Return>", calculate)
 
+root.protocol("WM_DELETE_WINDOW", on_close)
 root.mainloop()
