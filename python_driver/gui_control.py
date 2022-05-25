@@ -8,8 +8,8 @@ from serial.tools import list_ports
 from motor_control import motor_control
 
 NUM_MOTORS = 6
-freqs = [1, 30, 100, 200, 10, 1]
-dutys = [0.0, 0.0, 0.0, 0.19, 0.0, 0.0]
+freqs = [1, 30, 100, 20, 10, 1]
+dutys = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 delays = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 control = motor_control(NUM_MOTORS, None)
 
