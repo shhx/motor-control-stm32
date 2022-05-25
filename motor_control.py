@@ -51,7 +51,7 @@ class motor_control:
             self.connected = True
         except Exception as e:
             print(e)
-    
+
     def disconnect(self):
         if self.connected:
             self.ser.close()
@@ -72,7 +72,7 @@ class motor_control:
         cmd_bytes.extend(bytearray(c_uint8(num)))
         cmd_bytes.extend(bytearray(c_float(duty)))
         self.send_cmd(cmd_bytes)
-    
+
     def set_motor_delay(self, num: int, delay: float):
         self.motors[num].delay = delay
         cmd = cmd_struct(self.__header, 5, command.SET_DELAY.value)
@@ -80,22 +80,24 @@ class motor_control:
         cmd_bytes.extend(bytearray(c_uint8(num)))
         cmd_bytes.extend(bytearray(c_float(delay)))
         self.send_cmd(cmd_bytes)
-    
+
     def config_motor(self, num: int, freq: float, duty: float, delay: float):
-        print(freq, duty, delay)
+        # print(freq, duty, delay)
         self.set_motor_freq(num, freq)
         self.set_motor_duty(num, duty)
         self.set_motor_delay(num, delay)
 
     def start_motors(self):
-        cmd_start = cmd_struct(self.__header, 0, command.ACTIVATE_MOTORS.value)
-        self.send_cmd(bytearray(cmd_start))
-        print('STARTED!!!')
+        if self.connected:
+            cmd_start = cmd_struct(self.__header, 0, command.ACTIVATE_MOTORS.value)
+            self.send_cmd(bytearray(cmd_start))
+            print('STARTED!!!')
 
     def stop_motors(self):
-        cmd_stop = cmd_struct(self.__header, 0, command.STOP_MOTORS.value)
-        self.send_cmd(bytearray(cmd_stop))
-        print('STOP!!!')
+        if self.connected:
+            cmd_stop = cmd_struct(self.__header, 0, command.STOP_MOTORS.value)
+            self.send_cmd(bytearray(cmd_stop))
+            print('STOP!!!')
 
     def send_cmd(self, cmd: bytearray):
         if self.connected:

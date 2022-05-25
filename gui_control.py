@@ -89,7 +89,6 @@ row_init = 2
 for i in range(NUM_MOTORS):
     ttk.Label(mainframe, text=f'Valve {i+1}').grid(column=column, row=row_init + i + 1)
 
-
 column += 1
 freq_entries = []
 frame = Frame(mainframe)
